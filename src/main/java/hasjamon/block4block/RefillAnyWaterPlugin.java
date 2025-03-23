@@ -33,30 +33,36 @@ public class RefillAnyWaterPlugin extends JavaPlugin implements Listener {
     public void onBottleFill(PlayerInteractEvent event) {
         getLogger().info("PlayerInteractEvent triggered");
 
-        // Check if it's a right-click action and use the main hand
+        // Check if it's a right-click action
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             getLogger().info("Not a right-click, ignoring.");
-            return;
-        }
-        if (event.getHand() != EquipmentSlot.HAND) {
-            getLogger().info("Wrong hand used, ignoring.");
-            return;
-        }
-
-        // Check if the player is holding a glass bottle
-        ItemStack item = event.getItem();
-        if (item == null || item.getType() != Material.GLASS_BOTTLE) {
-            getLogger().info("No glass bottle found.");
             return;
         }
 
         Player player = event.getPlayer();
 
+        // Check for bottles in both hands
+        if (tryFillBottle(player, event.getHand())) {
+            // Cancel the event to prevent default behavior
+            event.setCancelled(true);
+        }
+    }
+
+    // Try to fill a bottle in the specified hand
+    private boolean tryFillBottle(Player player, EquipmentSlot hand) {
+        ItemStack item = player.getInventory().getItem(hand);
+
+        // Check if the player is holding a glass bottle
+        if (item == null || item.getType() != Material.GLASS_BOTTLE) {
+            getLogger().info("No glass bottle found.");
+            return false;
+        }
+
         // Check for water within 3 blocks in front of the player
         Block waterBlock = getNearbyWaterBlock(player);
         if (waterBlock == null) {
             getLogger().info("No water detected nearby, ignoring.");
-            return;
+            return false;
         }
 
         getLogger().info("Water block found, refilling bottle...");
@@ -66,7 +72,7 @@ public class RefillAnyWaterPlugin extends JavaPlugin implements Listener {
 
         // Refill the bottle correctly
         if (item.getAmount() == 1) {
-            player.getInventory().setItem(event.getHand(), waterBottle);
+            player.getInventory().setItem(hand, waterBottle);
         } else {
             item.setAmount(item.getAmount() - 1);
             player.getInventory().addItem(waterBottle);
@@ -76,8 +82,7 @@ public class RefillAnyWaterPlugin extends JavaPlugin implements Listener {
         player.playSound(player.getLocation(), Sound.ITEM_BOTTLE_FILL, 1.0f, 1.0f);
         getLogger().info("Bottle refilled successfully.");
 
-        // Cancel the event to prevent default behavior
-        event.setCancelled(true);
+        return true;
     }
 
     // Check for a valid water block within 4.5 blocks from the player's eye level
@@ -114,5 +119,4 @@ public class RefillAnyWaterPlugin extends JavaPlugin implements Listener {
         }
         return waterBottle;
     }
-
 }
