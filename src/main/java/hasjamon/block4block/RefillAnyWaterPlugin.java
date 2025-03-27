@@ -1,5 +1,6 @@
 package hasjamon.block4block;
 
+import hasjamon.block4block.listener.DirtWaterBottleListener;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -22,6 +23,7 @@ public class RefillAnyWaterPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         getLogger().info("RefillAnyWaterPlugin has been enabled!");
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new DirtWaterBottleListener(), this);
     }
 
     @Override

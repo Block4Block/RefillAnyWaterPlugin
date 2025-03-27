@@ -2,5 +2,5 @@ name: RefillAnyWaterPlugin
 main: hasjamon.block4block.RefillAnyWaterPlugin
 api-version: 1.21
 authors: [ HasJamOn, Bahm]
-version: 1.0
+version: 1.2
 description: Allows players to refill glass bottles from any water block, not just sources.
