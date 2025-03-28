@@ -30,6 +30,12 @@ public class DirtWaterBottleListener implements Listener {
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
         ItemStack offHandItem = player.getInventory().getItemInOffHand();
 
+        // Cancel event if the main hand is holding a shovel and the offhand contains a glass bottle
+        if (isShovel(mainHandItem) && offHandItem.getType() == Material.GLASS_BOTTLE) {
+            event.setCancelled(true);
+            return;
+        }
+
         // Check if the player is holding a shovel in main hand and a water bottle in offhand
         if (isShovel(mainHandItem) && offHandItem.getType() == Material.POTION) {
             // Check if the water bottle is in the offhand
@@ -65,3 +71,4 @@ public class DirtWaterBottleListener implements Listener {
                 type == Material.NETHERITE_SHOVEL;
     }
 }
+

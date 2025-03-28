@@ -13,3 +13,7 @@ target/maven-archiver/pom.properties
 target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
 target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
 target/RefillAnyWaterPlugin-1.1.jar
+target/RefillAnyWaterPlugin-1.3.jar
+target/RefillAnyWaterPlugin-1.2.jar
+target/classes/hasjamon/block4block/listener/DirtWaterBottleListener.class
+/target/
