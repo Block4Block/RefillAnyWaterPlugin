@@ -1,6 +1,7 @@
 package hasjamon.block4block;
 
 import hasjamon.block4block.listener.DirtWaterBottleListener;
+import hasjamon.block4block.listener.PlayerInWaterListener;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -24,6 +25,21 @@ public class RefillAnyWaterPlugin extends JavaPlugin implements Listener {
         getLogger().info("RefillAnyWaterPlugin has been enabled!");
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new DirtWaterBottleListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerInWaterListener(), this);
+
+        // Save default config if it doesn't exist
+        saveDefaultConfig();
+
+        // Register events
+        getServer().getPluginManager().registerEvents(new DirtWaterBottleListener(), this);
+
+        // Check if filling bottles while in water is enabled
+        if (getConfig().getBoolean("enable-standing-in-water-fill", true)) {
+            getServer().getPluginManager().registerEvents(new PlayerInWaterListener(), this);
+            getLogger().info("PlayerInWaterListener enabled.");
+        } else {
+            getLogger().info("PlayerInWaterListener is disabled via config.");
+        }
     }
 
     @Override

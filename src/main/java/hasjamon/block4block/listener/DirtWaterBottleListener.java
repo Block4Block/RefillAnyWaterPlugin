@@ -14,14 +14,14 @@ public class DirtWaterBottleListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        // Check if the action is right-click on block
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+        // Check if the action is right-click on block with the main hand
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) {
             return;
         }
 
-        // Check if the clicked block is dirt or similar (dirt, grass_block, etc.)
+        // Check if the clicked block is dirt, grass, or coarse dirt (for path conversion)
         Block block = event.getClickedBlock();
-        if (block == null || !(block.getType() == Material.DIRT || block.getType() == Material.GRASS_BLOCK)) {
+        if (block == null || !(block.getType() == Material.DIRT || block.getType() == Material.GRASS_BLOCK || block.getType() == Material.COARSE_DIRT)) {
             return;
         }
 
@@ -30,8 +30,8 @@ public class DirtWaterBottleListener implements Listener {
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
         ItemStack offHandItem = player.getInventory().getItemInOffHand();
 
-        // Cancel event if the main hand is holding a shovel and the offhand contains a glass bottle
-        if (isShovel(mainHandItem) && offHandItem.getType() == Material.GLASS_BOTTLE) {
+        // Cancel the event ONLY if the main hand is holding a shovel and the block would become a path
+        if (isShovel(mainHandItem) && offHandItem.getType() == Material.GLASS_BOTTLE && canTurnToPath(block)) {
             event.setCancelled(true);
             return;
         }
@@ -70,5 +70,10 @@ public class DirtWaterBottleListener implements Listener {
                 type == Material.DIAMOND_SHOVEL ||
                 type == Material.NETHERITE_SHOVEL;
     }
-}
 
+    // Helper method to check if the block can be converted to a path
+    private boolean canTurnToPath(Block block) {
+        Material type = block.getType();
+        return type == Material.GRASS_BLOCK || type == Material.DIRT || type == Material.COARSE_DIRT;
+    }
+}
