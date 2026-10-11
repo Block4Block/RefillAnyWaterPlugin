@@ -24,8 +24,6 @@ public class RefillAnyWaterPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         getLogger().info("RefillAnyWaterPlugin has been enabled!");
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new DirtWaterBottleListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerInWaterListener(), this);
 
         // Save default config if it doesn't exist
         saveDefaultConfig();
