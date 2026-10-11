@@ -29,8 +29,9 @@ public class DirtWaterBottleListener implements Listener {
     // HIGH and ignoreCancelled: runs after claim protection (e.g. Block4Block's, at NORMAL) and respects it
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        // Check if the action is right-click on block with the main hand
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) {
+        // Check if the action is right-click on block
+        EquipmentSlot hand = event.getHand();
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || hand == null) {
             return;
         }
 
@@ -50,14 +51,23 @@ public class DirtWaterBottleListener implements Listener {
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
         ItemStack offHandItem = player.getInventory().getItemInOffHand();
 
-        // Cancel the event ONLY if the main hand is holding a shovel and the block would become a path
-        if (isShovel(mainHandItem) && offHandItem.getType() == Material.GLASS_BOTTLE && canTurnToPath(block)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // A shovel in main hand and a water bottle (not any potion) in offhand
-        if (!isShovel(mainHandItem) || !isWaterBottle(offHandItem)) {
+        // Which hand's water bottle (not any potion) to use
+        EquipmentSlot bottleHand;
+        if (hand == EquipmentSlot.HAND && isShovel(mainHandItem)) {
+            // Cancel the event ONLY if the main hand is holding a shovel and the block would become a path
+            if (offHandItem.getType() == Material.GLASS_BOTTLE && canTurnToPath(block)) {
+                event.setCancelled(true);
+                return;
+            }
+            // A shovel in main hand and a water bottle in offhand
+            if (!isWaterBottle(offHandItem)) {
+                return;
+            }
+            bottleHand = EquipmentSlot.OFF_HAND;
+        } else if (block.getType() == Material.GRASS_BLOCK && isWaterBottle(player.getInventory().getItem(hand))) {
+            // A water bottle used on a grass block, like vanilla's on dirt (vanilla handles dirt itself)
+            bottleHand = hand;
+        } else {
             return;
         }
 
@@ -66,10 +76,14 @@ public class DirtWaterBottleListener implements Listener {
             return;
         }
 
-        // Use the offhand's water bottle instead of the shovel
+        // Use the water bottle (the offhand's instead of the shovel)
         event.setCancelled(true);
-        player.swingOffHand();
-        emptyWaterBottle(player, EquipmentSlot.OFF_HAND);
+        if (bottleHand == EquipmentSlot.OFF_HAND) {
+            player.swingOffHand();
+        } else {
+            player.swingMainHand();
+        }
+        emptyWaterBottle(player, bottleHand);
         player.incrementStatistic(Statistic.USE_ITEM, Material.POTION);
 
         // Change the target block to mud, with vanilla's sounds and splash particles
